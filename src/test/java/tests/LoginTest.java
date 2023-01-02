@@ -1,28 +1,12 @@
 package tests;
 
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.microsoft.playwright.Page;
+public class LoginTest extends BaseTest{
 
-import factory.Factory;
-import pages.LoginPage;
 
-public class LoginTest {
-
-	Factory factory;
-	Page page;
-	LoginPage loginPage;
-	
-	@BeforeTest
-	public void setup() {
-		factory = new Factory();
-		page = factory.initializeBrowser("chrome", false);
-		loginPage = new LoginPage(page);
-		
-	}
 	
 	@Test
 	public void loginTitleTest() {
@@ -34,7 +18,7 @@ public class LoginTest {
 	@Test
 	public void loginPageURLTest() {
 		String actualURL = loginPage.getPageURL();
-		if (actualURL.contains("")) { 
+		if (actualURL.contains("/maconomy")) { 
 			Assert.assertTrue(true);
 		} else {
 			Assert.assertTrue(false);
@@ -42,9 +26,26 @@ public class LoginTest {
 		//Assert.assertEquals(actualURL, "");
 	}
 	
-	
-	@AfterTest
-	public void tearDown() {
-		page.context().browser().close();
+	@DataProvider
+	public Object[][] getCredentials() {
+		return new Object [][] {
+			
+			{"Administrator","123456"},
+			{"Jack Johnson","123456"},
+			{"Andy Hansson","123456"}
+			
+			
+			
+		};
+		
 	}
+	
+	@Test(dataProvider = "getCredentials")
+	public void doLogin(String username, String password) {
+		loginPage.doLogin(username, password);
+		System.out.println("Tested using username: " + username);
+		
+	}
+	
+
 }

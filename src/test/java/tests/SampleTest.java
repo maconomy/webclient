@@ -1,31 +1,18 @@
-package maconomy.webclient;
-
-import org.testng.annotations.*;
-
-import com.microsoft.playwright.Browser;
-import com.microsoft.playwright.BrowserType;
-import com.microsoft.playwright.BrowserType.LaunchOptions;
-import com.microsoft.playwright.Page;
-import com.microsoft.playwright.Playwright;
+package tests;
 
 import org.testng.Assert;
+import org.testng.annotations.Test;
 
-public class BaseTest {
-	@BeforeTest
-	public void beforeTest() {
-		System.out.println("before test...");
-	}
-	@BeforeClass
-	public void beforeClass() {
-		System.out.println("before class...");
-	}
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.BrowserType.LaunchOptions;
+
+public class SampleTest {
 
 	
 	@Test
 	public void firstTest() {
-
-			
-
 		System.out.println("first testing passed!");
 		Playwright playwright = Playwright.create();
 		LaunchOptions launchOptions = new LaunchOptions();
@@ -46,7 +33,6 @@ public class BaseTest {
 		browser.close();
 		playwright.close();
 
-		
 	}
 	
 	@Test
@@ -59,5 +45,5 @@ public class BaseTest {
 	public void thirdTest() {
 		System.out.println("3rd testing failed!");
 		Assert.assertEquals("alex","nat");
-	}	
+	}
 }

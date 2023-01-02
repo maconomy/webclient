@@ -3,14 +3,15 @@
 <suite name="Failed suite [Default suite]" guice-stage="DEVELOPMENT">
   <test thread-count="5" name="Default test(failed)">
     <classes>
-      <class name="maconomy.webclient.BaseTest">
+      <class name="tests.LoginTest">
         <methods>
-          <include name="thirdTest"/>
-          <include name="beforeClass"/>
-          <include name="secondTest"/>
-          <include name="beforeTest"/>
+          <include name="loginPageURLTest"/>
+          <include name="loginTitleTest"/>
+          <include name="doLogin"/>
+          <include name="tearDown"/>
+          <include name="setup"/>
         </methods>
-      </class> <!-- maconomy.webclient.BaseTest -->
+      </class> <!-- tests.LoginTest -->
     </classes>
   </test> <!-- Default test(failed) -->
 </suite> <!-- Failed suite [Default suite] -->
