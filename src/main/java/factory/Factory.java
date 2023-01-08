@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Properties;
 
@@ -12,6 +13,7 @@ import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.options.WaitUntilState;
 
 public class Factory {
 
@@ -23,38 +25,67 @@ public class Factory {
 
 	Properties properties;
 	
+	//start for parallel local threading so each page will have individual reference and instantiation
+	ThreadLocal<Playwright> tlPlaywright = new ThreadLocal<>();
+	ThreadLocal<Browser> tlBrowser = new ThreadLocal<>();
+	ThreadLocal<BrowserContext> tlBrowserContext = new ThreadLocal<>();
+	static ThreadLocal<Page> tlPage = new ThreadLocal<>();
+	
+	public Playwright getPlaywright() {
+		return tlPlaywright.get();
+	}
+	public Browser getBrowser() {
+		return tlBrowser.get();
+	}
+	public BrowserContext getBrowserContext() {
+		return tlBrowserContext.get();
+	}
+	public static Page getPage() {
+		return tlPage.get();
+	}
+	//end for parallel
+	
 	public Page initializeBrowser(Properties properties) {
 		String browserName = properties.getProperty("browser").trim().toLowerCase();
 		boolean headless = Boolean.parseBoolean(properties.getProperty("headless")) ;
 		String URL = properties.getProperty("URL");
 		System.out.println("Browser selected: " + browserName);
-
-		playwright = Playwright.create();
+		tlPlaywright.set(Playwright.create()); //non-thread-non parallel value: playwright = Playwright.create();
+		
 		switch (browserName) {
 		case "chrome":
-			browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setChannel("chrome").setHeadless(headless));
+			//browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setChannel("chrome").setHeadless(headless));
+			//tlBrowser.set(getPlaywright().chromium().launch(new BrowserType.LaunchOptions().setChannel("chrome").setHeadless(headless)));
+			tlBrowser.set(getPlaywright().chromium().launch(new BrowserType.LaunchOptions().setHeadless(headless)));
 			break;
 		case "firefox":
-			browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setChannel("firefox").setHeadless(headless));
+			//browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setChannel("firefox").setHeadless(headless));
+			tlBrowser.set(getPlaywright().chromium().launch(new BrowserType.LaunchOptions().setChannel("firefox").setHeadless(headless)));
 			break;
 		case "edge":
-			browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setChannel("msedge").setHeadless(headless));
+			//browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setChannel("msedge").setHeadless(headless));
+			tlBrowser.set(getPlaywright().chromium().launch(new BrowserType.LaunchOptions().setChannel("msedge").setHeadless(headless)));
 			break;
 		case "safari":
-			browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setChannel("webkit").setHeadless(headless));
+			//browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setChannel("webkit").setHeadless(headless));
+			tlBrowser.set(getPlaywright().chromium().launch(new BrowserType.LaunchOptions().setChannel("webkit").setHeadless(headless)));
 			break;
 
 		default:
 			System.out.println("Unknown browser, select between chrome, firefox, edge or safari");
 			break;
 		}
+		tlBrowserContext.set(getBrowser().newContext());
+		//browserContext = browser.newContext();
+		//getBrowserContext().setDefaultNavigationTimeout(120000);
 		
-		browserContext = browser.newContext();
-		browserContext.setDefaultNavigationTimeout(120000);
-		page = browserContext.newPage();
-		page.navigate(URL);
+		//browserContext.setDefaultNavigationTimeout(120000);
+		tlPage.set(getBrowserContext().newPage());
+		//page = browserContext.newPage();
+		getPage().navigate(URL, new Page.NavigateOptions()
+				  .setWaitUntil(WaitUntilState.NETWORKIDLE)); //page.navigate(URL);
 		
-		return page;
+		return getPage(); //page;
 	}
 	
 	//this method get all values under file resources/config.properties
@@ -100,5 +131,7 @@ public class Factory {
 		}
 		
 	}
+	
+
 
 }

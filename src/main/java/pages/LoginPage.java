@@ -2,6 +2,7 @@ package pages;
 
 import com.microsoft.playwright.Page;
 
+
 public class LoginPage {
 
 	private Page page;
@@ -13,7 +14,7 @@ public class LoginPage {
 	String passwordTextbox = "//input[@id='password']";
 	String loginButton = "//button[@id='login']";
 	String languageDropdown = "//dm-language-selector//button";
-	
+	String sidebarButton = "//a[@title='Menu']";
 	// page constructor
 	public LoginPage (Page page) { 
 		this.page = page;
@@ -23,16 +24,22 @@ public class LoginPage {
 	
 	public String getPageTitle() {
 		return page.title();
+	
 	}
 	
 	public String getPageURL() {
 		return page.url();
 	}
 	
-	public void doLogin(String username, String password) { 
+	public MainPage doLogin(String username, String password) { 
 		page.fill(usernameTextbox, username);
 		page.fill(passwordTextbox, password);
 		page.click(loginButton);
+		page.waitForSelector(sidebarButton);
 		
+		
+		return new MainPage(page);
 	}
+
+	
 }

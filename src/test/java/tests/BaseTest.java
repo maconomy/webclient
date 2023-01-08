@@ -6,14 +6,17 @@ import org.testng.annotations.*;
 
 import factory.Factory;
 import pages.LoginPage;
-
+import pages.LogoutPage;
+import pages.MainPage;
 import com.microsoft.playwright.Page;
 
-public class BaseTest {
+public class BaseTest{
 	
 	Factory factory;
 	Page page;
 	LoginPage loginPage;
+	MainPage mainPage;
+	LogoutPage logoutPage;
 	Properties properties;
 	
 	@BeforeTest
@@ -31,12 +34,10 @@ public class BaseTest {
 	}
 
 	
-	
-	
-	@AfterSuite
+	@AfterTest
 	public void tearDown() {
 		//page.context().close();
-		//page.context().browser().close();
+		page.context().browser().close();
 		//factory.playwright.close();
 	}
 	
